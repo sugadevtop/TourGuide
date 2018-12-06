@@ -283,23 +283,23 @@ open class TourGuide(private val activity: Activity) {
 
                 if(_toolTip.hasArrow) {
                     textViewTriangle = TextView(activity)
-                    textViewTriangle?.setTextColor(_toolTip.mBackgroundColor)
+                    textViewTriangle?.setTextColor(_toolTip.arrowColor)
                     val textHeight = 12 * density
                     val textWidth = 15 * density
                     val heightPadding = textHeight / 10
 
-                    val triangleX = targetViewX.toFloat() + highlightedView.measuredWidth / 2 - textWidth / 2
+                    var triangleX = targetViewX.toFloat() + highlightedView.measuredWidth / 2 - textWidth / 2
                     var triangleY = 0f
                     var triangleText = ""
 
                     textViewTriangle?.x = triangleX
                     if (resultPoint.y > targetViewY) {
                         triangleText = "▲"
-                        triangleY = resultPoint.y.toFloat() - textHeight + heightPadding
+                        triangleY = resultPoint.y.toFloat() - textHeight + heightPadding + _toolTip.arrowMarginTop
 
                     } else {
                         triangleText = "▼"
-                        triangleY = resultPoint.y.toFloat() + toolTipMeasuredHeight - adjustment - heightPadding
+                        triangleY = resultPoint.y.toFloat() + toolTipMeasuredHeight - adjustment - heightPadding - _toolTip.arrowMarginBottom
                     }
 
                     if (triangleX > resultPoint.x + toolTipMeasuredWidth) {
@@ -307,6 +307,13 @@ open class TourGuide(private val activity: Activity) {
                     } else if (triangleX < resultPoint.x) {
                         triangleText = ""
                     }
+
+                    if(triangleX > highlightedView.measuredWidth / 2) {
+                        triangleX -= _toolTip.arrowMarginRight
+                    } else if (triangleX < highlightedView.measuredWidth / 2) {
+                        triangleX += _toolTip.arrowMarginLeft
+                    }
+
 
                     textViewTriangle?.text = triangleText
                     textViewTriangle?.x = triangleX

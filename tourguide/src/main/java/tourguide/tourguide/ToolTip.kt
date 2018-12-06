@@ -22,7 +22,13 @@ class ToolTip() {
     var mOnClickListener: View.OnClickListener? = null
     var mCustomView: ViewGroup? = null
     var mWidth: Int = 0
+
     var hasArrow: Boolean = false
+    var arrowColor: Int = Color.parseColor("#FFFFFF")
+    var arrowMarginTop: Int = 0
+    var arrowMarginBottom: Int = 0
+    var arrowMarginLeft: Int = 0
+    var arrowMarginRight: Int = 0
 
     init {
         /* default values */
@@ -77,6 +83,8 @@ class ToolTip() {
     fun exitAnimation(block: () -> Animation) {
         mExitAnimation = block()
     }
+
+
 
     /**
      * Set title text

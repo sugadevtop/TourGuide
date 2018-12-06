@@ -22,6 +22,7 @@ class ToolTip() {
     var mOnClickListener: View.OnClickListener? = null
     var mCustomView: ViewGroup? = null
     var mWidth: Int = 0
+    var hasArrow: Boolean = false
 
     init {
         /* default values */

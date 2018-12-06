@@ -7,6 +7,7 @@ import android.app.Activity
 import android.graphics.Color
 import android.graphics.Point
 import android.os.Build
+import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
 import android.util.Log
 import android.view.Gravity
@@ -15,6 +16,7 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import android.widget.TextView
 import kotlinx.android.synthetic.main.tourguide_tooltip.view.*
 import net.i2p.android.ext.floatingactionbutton.FloatingActionButton
 import tourguide.tourguide.util.locationOnScreen
@@ -33,12 +35,14 @@ open class TourGuide(private val activity: Activity) {
      *
      * @return the ToolTip container View
      */
+    var textViewTriangle: TextView? = null
     var toolTipView: View? = null
         private set
     var toolTip: ToolTip? = null
         private set
     var mPointer: Pointer? = null
-    var overlay: Overlay? = null
+    var overlay
+            : Overlay? = null
 
     private val screenWidth: Int
         get() = activity.resources?.displayMetrics?.widthPixels ?: 0
@@ -114,6 +118,9 @@ open class TourGuide(private val activity: Activity) {
     fun cleanUp() {
         frameLayoutWithHole?.cleanUp()
         toolTipView.also {
+            (activity.window.decorView as ViewGroup).removeView(it)
+        }
+        textViewTriangle.also {
             (activity.window.decorView as ViewGroup).removeView(it)
         }
     }
@@ -272,8 +279,41 @@ open class TourGuide(private val activity: Activity) {
                 }
 
                 resultPoint.y = getYForTooTip(_toolTip.mGravity, toolTipMeasuredHeight, targetViewY, adjustment)
-
                 parent.addView(_toolTipView, layoutParams)
+
+                if(_toolTip.hasArrow) {
+                    textViewTriangle = TextView(activity)
+                    textViewTriangle?.setTextColor(_toolTip.mBackgroundColor)
+                    val textHeight = 12 * density
+                    val textWidth = 15 * density
+                    val heightPadding = textHeight / 10
+
+                    val triangleX = targetViewX.toFloat() + highlightedView.measuredWidth / 2 - textWidth / 2
+                    var triangleY = 0f
+                    var triangleText = ""
+
+                    textViewTriangle?.x = triangleX
+                    if (resultPoint.y > targetViewY) {
+                        triangleText = "▲"
+                        triangleY = resultPoint.y.toFloat() - textHeight + heightPadding
+
+                    } else {
+                        triangleText = "▼"
+                        triangleY = resultPoint.y.toFloat() + toolTipMeasuredHeight - adjustment - heightPadding
+                    }
+
+                    if (triangleX > resultPoint.x + toolTipMeasuredWidth) {
+                        triangleText = ""
+                    } else if (triangleX < resultPoint.x) {
+                        triangleText = ""
+                    }
+
+                    textViewTriangle?.text = triangleText
+                    textViewTriangle?.x = triangleX
+                    textViewTriangle?.y = triangleY
+                    textViewTriangle?.startAnimation(_toolTip.mEnterAnimation)
+                    parent.addView(textViewTriangle)
+                }
 
                 // 1. width < screen check
                 if (toolTipMeasuredWidth > parent.width) {
